@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenotekToGedcom", "GenotekToGedcom\GenotekToGedcom.csproj", "{1A3423EB-235C-4219-B5CE-AB1D714021FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Linq2Gedcom", "Linq2Gedcom\Linq2Gedcom.csproj", "{DBE0C36E-8419-4C77-A8AE-16157E2EA06F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A3423EB-235C-4219-B5CE-AB1D714021FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A3423EB-235C-4219-B5CE-AB1D714021FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A3423EB-235C-4219-B5CE-AB1D714021FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A3423EB-235C-4219-B5CE-AB1D714021FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBE0C36E-8419-4C77-A8AE-16157E2EA06F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBE0C36E-8419-4C77-A8AE-16157E2EA06F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBE0C36E-8419-4C77-A8AE-16157E2EA06F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBE0C36E-8419-4C77-A8AE-16157E2EA06F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
