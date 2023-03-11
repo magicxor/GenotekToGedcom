@@ -16,6 +16,7 @@ public static class GenotekToGedcomUtils
         var people = genotekData
             .Data
             .Nodes
+            .Where(node => node.Card?.Relatives?.Any() == true)
             .Select((node, index) =>
                 new
                 {
