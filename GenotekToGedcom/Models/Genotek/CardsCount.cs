@@ -5,11 +5,11 @@ namespace GenotekToGedcom.Models.Genotek;
 public class CardsCount
 {
     [JsonProperty("full_tree")]
-    public long FullTree { get; set; }
+    public int FullTree { get; set; }
 
     [JsonProperty("relatives_only")]
-    public long RelativesOnly { get; set; }
+    public int RelativesOnly { get; set; }
 
     [JsonProperty("generations_only")]
-    public long GenerationsOnly { get; set; }
+    public int GenerationsOnly { get; set; }
 }
