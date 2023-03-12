@@ -5,11 +5,11 @@ namespace GenotekToGedcom.Models.Genotek;
 public class Birthdate
 {
     [JsonProperty("day")]
-    public long? Day { get; set; }
+    public int? Day { get; set; }
 
     [JsonProperty("month")]
-    public long? Month { get; set; }
+    public int? Month { get; set; }
 
     [JsonProperty("year")]
-    public long? Year { get; set; }
+    public int? Year { get; set; }
 }

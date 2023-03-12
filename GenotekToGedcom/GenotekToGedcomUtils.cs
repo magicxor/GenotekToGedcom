@@ -1,4 +1,5 @@
 ﻿using GenotekToGedcom.Models.Genotek;
+using GenotekToGedcom.Utils;
 using LINQ2GEDCOM;
 using LINQ2GEDCOM.Entities;
 
@@ -6,7 +7,7 @@ namespace GenotekToGedcom;
 
 public static class GenotekToGedcomUtils
 {
-    public static void SaveAsGed(this GenotekData genotekData, string outputFilePath)
+    public static void SaveAsGed(this GenotekData genotekData, string outputFilePath, bool fixDanglingRelations = false)
     {
         if (genotekData.Data?.Nodes == null)
         {
@@ -22,23 +23,25 @@ public static class GenotekToGedcomUtils
                 {
                     Key = node.Id ?? Guid.NewGuid().ToString(),
                     Individual = new Individual
-                    {
-                        ID = index,
-                        Sex = node.Card?.Gender switch
                         {
-                            "Female" => "F",
-                            "Male" => "M",
-                            _ => "U",
-                        },
-                        Names = new List<Name>
-                        {
-                            new()
+                            ID = index,
+                            Sex = node.Card?.Gender switch
                             {
-                                GivenName = string.Join(' ', node.Card?.Name ?? Array.Empty<string>()),
-                                Surname = string.Join(' ', node.Card?.Surname ?? Array.Empty<string>()),
-                            }
+                                "Female" => "F",
+                                "Male" => "M",
+                                _ => "U",
+                            },
+                            Names = new List<Name>
+                            {
+                                new()
+                                {
+                                    GivenName = string.Join(' ', node.Card?.Name ?? Array.Empty<string>()),
+                                    Surname = string.Join(' ', node.Card?.Surname ?? Array.Empty<string>()),
+                                }
+                            },
                         }
-                    },
+                        .WithBirthdate(node.Card)
+                        .WithDeathdate(node.Card),
                 }
             )
             .ToDictionary(dictItem => dictItem.Key, dictItem => dictItem.Individual);
@@ -96,10 +99,17 @@ public static class GenotekToGedcomUtils
                     .Data
                     .Nodes
                     .Where(node =>
-                        (node.Card?.Relatives?.Any(
-                            cr => cr.RelationType == "parent" && cr.Id == family.Husband.personKey) ?? false)
-                        && (node.Card?.Relatives?.Any(
-                            cr => cr.RelationType == "parent" && cr.Id == family.Wife.personKey) ?? false))
+                        // both parents match the family
+                        ((node.Card?.Relatives?.Any(
+                             cr => cr.RelationType == "parent" && cr.Id == family.Husband.personKey) ?? false)
+                         && (node.Card?.Relatives?.Any(
+                             cr => cr.RelationType == "parent" && cr.Id == family.Wife.personKey) ?? false))
+                        // or one parent matches the family and the other parent is not specified
+                        || (fixDanglingRelations
+                            && (node.Card?.Relatives?.Count(cr => cr.RelationType == "parent") == 1)
+                            && (node.Card?.Relatives?.Any(
+                                cr => cr.RelationType == "parent" && (cr.Id == family.Husband.personKey || cr.Id == family.Wife.personKey)) ?? false))
+                    )
                     .Select(node => people!.GetValueOrDefault(node.Id))
                     .Where(individual => individual != null)
                     .ToList()

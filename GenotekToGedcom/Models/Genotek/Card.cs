@@ -17,7 +17,7 @@ public class Card
     public string? Email { get; set; }
 
     [JsonProperty("liveOrDead")]
-    public long? LiveOrDead { get; set; }
+    public int? LiveOrDead { get; set; }
 
     [JsonProperty("name")]
     public string[]? Name { get; set; }
