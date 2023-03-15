@@ -1,5 +1,5 @@
-﻿using GenotekToGedcom;
-using GenotekToGedcom.Models.Genotek;
+﻿using GenotekToGedcom.Models.Genotek;
+using GenotekToGedcom.Utils;
 using Newtonsoft.Json;
 
 Console.WriteLine($"Converting {args[0]} to {args[1]}...");

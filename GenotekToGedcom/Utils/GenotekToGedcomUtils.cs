@@ -1,9 +1,8 @@
 ﻿using GenotekToGedcom.Models.Genotek;
-using GenotekToGedcom.Utils;
 using LINQ2GEDCOM;
 using LINQ2GEDCOM.Entities;
 
-namespace GenotekToGedcom;
+namespace GenotekToGedcom.Utils;
 
 public static class GenotekToGedcomUtils
 {
