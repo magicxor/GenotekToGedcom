@@ -26,9 +26,9 @@ public static class DateStringUtils
             return null;
         }
 
-        var year = date?.Year?.ToString(CultureInfo.InvariantCulture) ?? "0000";
-        var month = date?.Month?.ToString(CultureInfo.InvariantCulture) ?? "00";
-        var day = date?.Day?.ToString(CultureInfo.InvariantCulture) ?? "00";
+        var year = date.Year?.ToString(CultureInfo.InvariantCulture) ?? "0000";
+        var month = date.Month?.ToString(CultureInfo.InvariantCulture) ?? "00";
+        var day = date.Day?.ToString(CultureInfo.InvariantCulture) ?? "00";
 
         return new DatePart($"{year}{month}{day}")
             .ToString(CultureInfo.InvariantCulture);

@@ -8,6 +8,12 @@ var fixDanglingRelations = args is [_, _, "--fix-dangling-relations"];
 
 var genotekData = JsonConvert.DeserializeObject<GenotekData>(File.ReadAllText(args[0]));
 
-genotekData.SaveAsGed(args[1], fixDanglingRelations);
-
-Console.WriteLine($"OK");
+if (genotekData != null)
+{
+    genotekData.SaveAsGed(args[1], fixDanglingRelations);
+    Console.WriteLine("OK");
+}
+else
+{
+    Console.WriteLine("ERROR: no genotek data found");
+}
