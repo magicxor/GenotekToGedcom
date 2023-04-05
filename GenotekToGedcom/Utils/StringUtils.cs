@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
 using GenDateTools;
 using GenotekToGedcom.Models.Genotek;
+using Unidecode.NET;
 
 namespace GenotekToGedcom.Utils;
 
-public static class DateStringUtils
+public static class StringUtils
 {
     public static string? ToGedcomDate(this Birthdate[]? dates)
     {
@@ -32,5 +33,22 @@ public static class DateStringUtils
 
         return new DatePart($"{year}{month}{day}")
             .ToString(CultureInfo.InvariantCulture);
+    }
+    
+    public static string ToSingleString(IEnumerable<string>? strings, bool transliterate = false)
+    {
+        var result = string.Join(' ', strings ?? Array.Empty<string>());
+
+        if (string.IsNullOrWhiteSpace(result))
+        {
+            return result;
+        }
+        
+        if (transliterate)
+        {
+            result = result.Unidecode();
+        }
+
+        return result;
     }
 }

@@ -6,7 +6,7 @@ namespace GenotekToGedcom.Utils;
 
 public static class GenotekToGedcomUtils
 {
-    public static void SaveAsGed(this GenotekData genotekData, string outputFilePath, bool fixDanglingRelations = false)
+    public static void SaveAsGed(this GenotekData genotekData, string outputFilePath, bool fixDanglingRelations = false, bool transliterate = false)
     {
         if (genotekData.Data?.Nodes == null)
         {
@@ -34,13 +34,13 @@ public static class GenotekToGedcomUtils
                             {
                                 new()
                                 {
-                                    GivenName = string.Join(' ', node.Card?.Name ?? Array.Empty<string>()),
-                                    Surname = string.Join(' ', node.Card?.Surname ?? Array.Empty<string>()),
-                                }
+                                    GivenName = StringUtils.ToSingleString(node.Card?.Name, transliterate),
+                                    Surname = StringUtils.ToSingleString(node.Card?.Surname, transliterate),
+                                },
                             },
                         }
-                        .WithBirthdate(node.Card)
-                        .WithDeathdate(node.Card),
+                        .WithBirthdate(node.Card, transliterate)
+                        .WithDeathdate(node.Card, transliterate),
                 }
             )
             .ToDictionary(dictItem => dictItem.Key, dictItem => dictItem.Individual);

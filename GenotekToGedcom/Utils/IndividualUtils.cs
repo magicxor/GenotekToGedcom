@@ -5,7 +5,7 @@ namespace GenotekToGedcom.Utils;
 
 public static class IndividualUtils
 {
-    public static Individual WithBirthdate(this Individual individual, Card? card)
+    public static Individual WithBirthdate(this Individual individual, Card? card, bool transliterate = false)
     {
         if (card == null)
         {
@@ -17,14 +17,14 @@ public static class IndividualUtils
             individual.Birth = new Event(Event.EventType.Birth)
             {
                 Date = card.Birthdate?.ToGedcomDate(),
-                Place = string.Join(' ', card.Birthplace ?? Array.Empty<string>()),
+                Place = StringUtils.ToSingleString(card.Birthplace, transliterate),
             };
         }
 
         return individual;
     }
     
-    public static Individual WithDeathdate(this Individual individual, Card? card)
+    public static Individual WithDeathdate(this Individual individual, Card? card, bool transliterate = false)
     {
         if (card == null)
         {
@@ -36,7 +36,7 @@ public static class IndividualUtils
             individual.Death = new Event(Event.EventType.Death)
             {
                 Date = card.Deathdate?.ToGedcomDate(),
-                Place = string.Join(' ', card.Deathplace ?? Array.Empty<string>()),
+                Place = StringUtils.ToSingleString(card.Deathplace, transliterate),
             };
         }
 
