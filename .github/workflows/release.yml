@@ -1,0 +1,116 @@
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+
+name: release
+
+env:
+  PROJECT_DIR: ./GenotekToGedcom
+  PROJECT_PATH: ./GenotekToGedcom/GenotekToGedcom.csproj
+  FRAMEWORK: net8.0
+  SELF_CONTAINED: true
+  FILE_PREFIX: GenotekToGedcom_
+
+jobs:
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        rid:
+          - win-x64
+          - win-arm64
+          - linux-x64
+          - linux-arm64
+          - osx-arm64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Get branch and tag
+        id: branch_name
+        run: |
+          echo "SOURCE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Get ref info
+        id: ref_info
+        env:
+          GIT_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        run: |
+          if [[ -z ${GIT_TAG} ]]; then exit 1; else appversion=${GIT_TAG}; fi
+          echo "VERSION=${appversion}" >> $GITHUB_OUTPUT
+
+      - name: Replace project version
+        run: |
+          sed -i "s/<Version>.*<\/Version>/<Version>${{ steps.ref_info.outputs.VERSION }}<\/Version>/" ${{ env.PROJECT_PATH }}
+
+      - name: Build and package
+        id: build_package
+        working-directory: ${{ env.PROJECT_DIR }}
+        shell: bash
+        run: |
+          if [ "${{ env.SELF_CONTAINED }}" = "true" ]; then
+            SC_FLAG="--self-contained"
+            SC_POSTFIX="_self-contained"
+          else
+            SC_FLAG="--no-self-contained"
+            SC_POSTFIX=""
+          fi
+
+          dotnet publish -c release -r ${{ matrix.rid }} --framework ${{ env.FRAMEWORK }} $SC_FLAG
+
+          ZIP_NAME="${{ env.FILE_PREFIX }}${{ matrix.rid }}_${{ env.FRAMEWORK }}${SC_POSTFIX}.zip"
+          7z a "$ZIP_NAME" "./bin/release/${{ env.FRAMEWORK }}/${{ matrix.rid }}/publish/*"
+
+          # Set output variable for ZIP_NAME
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build_package.outputs.ZIP_NAME }}
+          path: ${{ env.PROJECT_DIR }}/${{ steps.build_package.outputs.ZIP_NAME }}
+
+  publish:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Get ref info
+        id: ref_info
+        run: |
+          GIT_TAG=${GITHUB_REF#refs/tags/}
+          if [[ ${GIT_TAG} =~ (alpha|beta|rc) ]]; then
+            echo "IS_PRERELEASE=true" >> $GITHUB_OUTPUT
+            echo "MAKE_LATEST=false" >> $GITHUB_OUTPUT
+          else
+            echo "IS_PRERELEASE=false" >> $GITHUB_OUTPUT
+            echo "MAKE_LATEST=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: ${{ steps.ref_info.outputs.IS_PRERELEASE }}
+          make_latest: ${{ steps.ref_info.outputs.MAKE_LATEST }}
+          generate_release_notes: true
+          files: ./artifacts/**/*.zip
